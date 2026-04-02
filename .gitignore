@@ -1,0 +1,15 @@
+# Rust build output
+/target
+
+# KITTI dataset (large files, not redistributable)
+/data
+*.zip
+
+# Generated trajectory CSVs (output artifacts)
+drive_*_trajectory.csv
+trajectory.csv
+
+# Python
+__pycache__/
+.venv/
+
