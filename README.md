@@ -268,7 +268,7 @@ sequenceDiagram
     OXTS-->>Filter: OxtsRecord {lat,lon,vn,ve,vf,accel,gyro,vel_accuracy}
 
     loop Each frame i
-        Filter->>Filter: IMU Predict\nP⁻ = FP⁻Fᵀ + Q
+        Filter->>Filter: IMU Predict (P = FPFt + Q)
         alt GPS not in outage window
             Filter->>GPS: position_enu, σ=0.5m
             GPS-->>Filter: δx, P⁺ (Joseph form)
@@ -351,9 +351,11 @@ eskf/
 │       ├── tracker.rs       # KLT optical flow
 │       └── epipolar.rs      # Essential matrix RANSAC + decomposition
 ├── plot_trajectories.py     # 4-panel matplotlib visualisation (ATE + RPE)
-├── drive_0001_trajectory.csv
-├── drive_0009_trajectory.csv
 └── eskf_results.png         # Latest plot output
+
+# Output files (generated at runtime, not committed)
+# drive_0001_trajectory.csv
+# drive_0009_trajectory.csv
 ```
 
 ---
@@ -385,12 +387,12 @@ OXTS (Oxford Technical Solutions — the GPS/IMU unit mounted in the KITTI vehic
 
 | Metric | Definition |
 |---|---|
-| **ATE** (Absolute Trajectory Error) | $\sqrt{\frac{1}{N}\sum_i\|\hat{\mathbf{p}}_i - \mathbf{p}_i\|^2}$ — global accuracy |
+| **ATE** (Absolute Trajectory Error) | $\sqrt{\frac{1}{N}\sum_i\lVert\hat{\mathbf{p}}_i - \mathbf{p}_i\rVert^2}$ — global accuracy |
 | **Phase RMSE** | ATE computed separately for pre/during/post GPS outage window |
-| **Peak error** | $\max_i \|\hat{\mathbf{p}}_i - \mathbf{p}_i\|$ during outage — worst-case safety bound |
+| **Peak error** | $\max_i \lVert\hat{\mathbf{p}}_i - \mathbf{p}_i\rVert$ during outage — worst-case safety bound |
 | **End-of-outage error** | Error at GPS re-acquisition frame — determines re-convergence start |
 | **Drift rate** | Peak outage error / outage duration (m/s) — normalised across sequence lengths |
-| **RPE** (Relative Pose Error, $w$-frame window) | $\|\Delta\hat{\mathbf{p}}_{i:i+w} - \Delta\mathbf{p}_{i:i+w}\|$ — local consistency; exposes drift even when ATE looks modest |
+| **RPE** (Relative Pose Error, $w$-frame window) | $\lVert\Delta\hat{\mathbf{p}}_{i:i+w} - \Delta\mathbf{p}_{i:i+w}\rVert$ — local consistency; exposes drift even when ATE looks modest |
 
 ---
 
